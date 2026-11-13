@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Web research agent{% endblock %}</title>
+  <style>
+    :root {
+      --ink: #1b2430;
+      --muted: #5d6a75;
+      --page: #f5f7f8;
+      --surface: #ffffff;
+      --line: #d5dbe0;
+      --accent: #0b6e6e;
+      --accent-ink: #ffffff;
+      --danger: #a3262a;
+      --log-bg: #12202b;
+      --log-ink: #cfe3e8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--page); color: var(--ink);
+      font: 16px/1.55 "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    a { color: var(--accent); }
+    a:focus-visible, button:focus-visible, textarea:focus-visible, input:focus-visible {
+      outline: 3px solid #6bb8b8; outline-offset: 2px;
+    }
+    header.top {
+      background: var(--surface); border-bottom: 1px solid var(--line);
+    }
+    header.top .bar {
+      max-width: 760px; margin: 0 auto; padding: 12px 20px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    header.top .brand { font-weight: 650; color: var(--ink); text-decoration: none; }
+    header.top form { margin: 0; display: inline; }
+    .who { color: var(--muted); font-size: 0.9rem; }
+    main { max-width: 760px; margin: 0 auto; padding: 28px 20px 64px; }
+    h1 { font-size: 1.6rem; line-height: 1.25; margin: 0 0 6px; }
+    h2 { font-size: 1.1rem; margin: 32px 0 10px; }
+    p.lead { color: var(--muted); margin: 0 0 20px; }
+    label { display: block; font-weight: 600; margin-bottom: 6px; }
+    textarea, input[type=text], input[type=password] {
+      width: 100%; padding: 10px 12px; font: inherit; color: inherit;
+      background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+    }
+    textarea { resize: vertical; }
+    button, .btn {
+      display: inline-block; font: inherit; font-weight: 600; cursor: pointer;
+      padding: 9px 16px; border-radius: 6px; border: 1px solid var(--accent);
+      background: var(--accent); color: var(--accent-ink); text-decoration: none;
+    }
+    button.quiet, .btn.quiet { background: transparent; color: var(--accent); }
+    button.link {
+      background: none; border: none; padding: 0; color: var(--accent);
+      font-weight: 400; text-decoration: underline;
+    }
+    .actions { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .errorlist { list-style: none; margin: 4px 0 8px; padding: 0; color: var(--danger); font-size: 0.92rem; }
+    .helptext, form ul:not(.errorlist) { color: var(--muted); font-size: 0.88rem; }
+    form div + div { margin-top: 12px; }
+    .msg { padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; border: 1px solid var(--line); background: var(--surface); }
+    .msg.error { border-color: var(--danger); color: var(--danger); }
+    table.jobs { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+    table.jobs td { padding: 10px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+    table.jobs tr:first-child td { border-top: none; }
+    table.jobs td.when { color: var(--muted); font-size: 0.88rem; white-space: nowrap; }
+    .pill { font-size: 0.85rem; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); white-space: nowrap; }
+    .pill.done { border-color: var(--accent); color: var(--accent); }
+    .pill.error { border-color: var(--danger); color: var(--danger); }
+    .empty { color: var(--muted); padding: 14px 0; }
+    pre.log {
+      background: var(--log-bg); color: var(--log-ink); border-radius: 6px; padding: 14px;
+      font: 0.85rem/1.5 Consolas, "Courier New", monospace; white-space: pre-wrap; word-break: break-word;
+      max-height: 260px; overflow: auto; margin: 0;
+    }
+    .answer {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+      padding: 20px 22px; font: 1.05rem/1.7 Georgia, "Times New Roman", serif; white-space: pre-wrap;
+      max-width: 72ch;
+    }
+    .answer-wrap { overflow-x: auto; }
+    .meta { color: var(--muted); font-size: 0.9rem; }
+    @media (max-width: 520px) { main { padding: 20px 14px 48px; } table.jobs td.when { display: none; } }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="bar">
+      <a class="brand" href="{% url 'research:home' %}">Web research agent</a>
+      <div class="who">
+        {% if user.is_authenticated %}
+          {{ user.username }} &middot;
+          <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="link" type="submit">Log out</button></form>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+  <main>
+    {% for message in messages %}
+      <div class="msg {{ message.tags }}" role="status">{{ message }}</div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

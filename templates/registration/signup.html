@@ -1,0 +1,11 @@
+{% extends "research/base.html" %}
+{% block title %}Create account{% endblock %}
+{% block content %}
+  <h1>Create an account</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form }}
+    <div class="actions"><button type="submit">Create account</button></div>
+  </form>
+  <p class="meta" style="margin-top:20px">Already registered? <a href="{% url 'login' %}">Log in</a>.</p>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "research/base.html" %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+  <h1>Log in</h1>
+  <p class="lead">Log in to ask questions and see your past research.</p>
+  <form method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="hidden" name="next" value="{{ next }}">
+    <div class="actions"><button type="submit">Log in</button></div>
+  </form>
+  <p class="meta" style="margin-top:20px">No account? <a href="{% url 'research:signup' %}">Create one</a>.</p>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "research/base.html" %}
+{% block title %}{{ job.question|truncatechars:60 }}{% endblock %}
+{% block content %}
+  <p class="meta"><a href="{% url 'research:home' %}">All research</a></p>
+  <h1 dir="auto">{{ job.question }}</h1>
+  <p class="meta">
+    <span class="pill {{ job.status }}" id="status-pill">{{ job.get_status_display }}</span>
+    &nbsp;Started {{ job.created_at|date:"Y-m-d H:i" }}
+  </p>
+
+  {% if job.status == "error" %}
+    <div class="msg error" role="alert">
+      <strong>The research failed.</strong><br>{{ job.error }}
+    </div>
+  {% endif %}
+
+  {% if job.status == "done" %}
+    <div class="actions">
+      {% if job.pdf_path %}<a class="btn" href="{% url 'research:download' job.pk 'pdf' %}">Download PDF</a>{% endif %}
+      {% if job.docx_path %}<a class="btn quiet" href="{% url 'research:download' job.pk 'docx' %}">Download Word file</a>{% endif %}
+    </div>
+    <h2>Answer</h2>
+    <div class="answer-wrap"><div class="answer" dir="auto">{{ job.answer }}</div></div>
+  {% endif %}
+
+  <h2>Agent steps</h2>
+  <pre class="log" id="log">{% if job.log %}{{ job.log }}{% elif job.is_active %}Waiting for the first step...{% else %}No steps recorded.{% endif %}</pre>
+
+  {% if job.is_active %}
+  <script>
+    (function () {
+      var url = "{% url 'research:status' job.pk %}";
+      var pill = document.getElementById("status-pill");
+      var log = document.getElementById("log");
+      function poll() {
+        fetch(url, { headers: { "Accept": "application/json" }, credentials: "same-origin" })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            pill.textContent = data.label;
+            pill.className = "pill " + data.status;
+            if (data.log) { log.textContent = data.log; log.scrollTop = log.scrollHeight; }
+            if (data.status === "done" || data.status === "error") { window.location.reload(); }
+            else { setTimeout(poll, 3000); }
+          })
+          .catch(function () { setTimeout(poll, 6000); });
+      }
+      setTimeout(poll, 2000);
+    })();
+  </script>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "research/base.html" %}
+{% block content %}
+  <h1>Ask a research question</h1>
+  <p class="lead">The agent searches the web, reads the best sources and writes a summary with links. It can take a few minutes.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <label for="{{ form.question.id_for_label }}">{{ form.question.label }}</label>
+    {{ form.question }}
+    {{ form.question.errors }}
+    <div class="actions"><button type="submit">Start research</button></div>
+  </form>
+
+  <h2>Your research</h2>
+  {% if jobs %}
+    <table class="jobs">
+      {% for j in jobs %}
+        <tr>
+          <td dir="auto"><a href="{% url 'research:job' j.pk %}">{{ j.question|truncatechars:90 }}</a></td>
+          <td><span class="pill {{ j.status }}">{{ j.get_status_display }}</span></td>
+          <td class="when">{{ j.created_at|date:"Y-m-d H:i" }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <p class="empty">Nothing yet. Ask your first question above.</p>
+  {% endif %}
+{% endblock %}
